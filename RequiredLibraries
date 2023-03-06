@@ -1,0 +1,14 @@
+Pyinstaller - to make the file executable
+pip3 -
+adafruit-python-shell--
+
+//circuitpython-DHT Library
+pip3 install adafruit-circuitpython-dhtDevice
+sudo apt-get install libgpiod.
+
+//if executable cannot run due to file not found exceptio,
+do this:
+Either manually create the missing folders you see in the error "/home/pi/dht/microcontroller..."
+Then go to the libgpiod folder and copy the libgpiod_ pulsein executable and paste it in the above path
+or simply install libgpiod in the path where your python executable is.
+
