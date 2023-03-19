@@ -1,9 +1,9 @@
 # Description: This program displays the contents of the log file in a GUI window
                                
-import tkinter as tk
-import asyncio
-import os
-from tkinter import *
+import tkinter as tk #tkinter library
+import os #operating system library
+import fcntl #file locking library
+import time #time library
 
 #create a new window for displaying the file contents from the log
 window = tk.Tk()
@@ -17,25 +17,34 @@ window.resizable(width=False, height=False)
 text_widget = tk.Text(window)
 text_widget.pack(fill="both", expand=True)
 #read cotents from the log
-async def read_file(filename):
-     while True:
-          with open(filename, "r") as file:
-              for line in file:
-                     #insert the file content into the widget
-                     text_widget.insert("end", line)
-                     text_widget.update() #dynamically update the widget with new information
-              await asyncio.sleep(3) #wait 3 seconds before reading the file again
-              text_widget.delete("1.0", "end")
+class DispClass(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        frame = tk.Frame(self.master)
+        frame.pack(fill="both", expand=True)
 
-async def main():
-    filename = "/home/pi/Desktop/Temperature_Humidity.log"
-    if os.path.exists(filename): #returns true if file exists
-         await read_file(filename)
-    else:
-        text_widget.insert("end","""Sensor log was not found!!\nIs the sensor running?\n"""
-                             """Restart this program when the sensor is operational""")
-        text_widget.configure(state="disabled") #disbaled editing
+        # display the file content here
+        self.text_widget = tk.Text(frame, bg="midnightblue", fg= "white",font=("Arial", 16))
+        self.text_widget.pack(fill="both", expand=True)
+        self.label = tk.Label(frame, text="Reading Temperature...", fg="white")
+        self.label.pack()
 
-if __name__ == '__main__':
-     asyncio.run(main())
-     window.mainloop() #display the main window
+    def read_file(self, q, filename):
+        while True:
+            try:
+                with open(filename, "r") as file:
+                    fcntl.flock(file, fcntl.LOCK_SH)
+
+                    for line in file:
+                        # insert the file content into the queue
+                        q.put(line)
+                         
+                    fcntl.flock(file, fcntl.LOCK_UN)
+
+                time.sleep(10)
+                self.text_widget.delete("1.0", "end")
+            except tk.TclError as error:  # program will know that its been closed on purpose
+                print("Program was closed", error)
+                return
+
+
