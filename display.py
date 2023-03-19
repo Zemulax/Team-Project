@@ -4,19 +4,9 @@ import tkinter as tk #tkinter library
 import os #operating system library
 import fcntl #file locking library
 import time #time library
+import threading #threading library
+from queue import Queue #queue library
 
-#create a new window for displaying the file contents from the log
-window = tk.Tk()
-window.title("Sensor Log")
-window.geometry("350x100")
-window.configure(bg="purple")
-window.configure(borderwidth=10, relief="groove")
-window.resizable(width=False, height=False)
-
-#display the file content here
-text_widget = tk.Text(window)
-text_widget.pack(fill="both", expand=True)
-#read cotents from the log
 class DispClass(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
@@ -48,3 +38,50 @@ class DispClass(tk.Frame):
                 return
 
 
+def main():
+    filename = "/home/pi/Desktop/Temperature_Humidity.log"
+    if os.path.exists(filename):  # returns true if file exists
+        # create a new window for displaying the file contents from the log
+        window = tk.Tk()
+        window.title("DHT11")
+        window.geometry("380x250")
+        window.configure(bg="white")
+        window.configure(borderwidth=10, relief="sunken")
+        window.resizable(width=False, height=False)
+
+        disp = DispClass(master=window)
+        disp.pack(fill="both", expand=True)
+
+        q = Queue()
+        t = threading.Thread(target=disp.read_file, args=(q, filename))
+        t.start()
+
+        def update_text_widget():
+            while not q.empty():
+                line = q.get_nowait()
+                disp.text_widget.insert("end",line)
+                disp.text_widget.see("end")
+            window.after(500, update_text_widget)
+            
+        window.after(500, update_text_widget)
+        window.mainloop()
+
+    else:
+        # create a new window for displaying the error message
+        window = tk.Tk()
+        window.title("DHT11")
+        window.geometry("400x250")
+        window.configure(borderwidth=5, relief="sunken")
+        window.resizable(width=False, height=False)
+
+        disp = DispClass(master=window)
+        disp.pack(fill="both", expand=True)
+
+        disp.text_widget.insert("end", """Sensor log was not found!!\nIs the sensor running?\n"""
+                                       """Restart this program when the sensor is operational""")
+        disp.text_widget.configure(state="disabled")  # disabled editing
+
+        window.mainloop()
+
+if __name__ == '__main__':
+    main()
