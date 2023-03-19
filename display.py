@@ -7,37 +7,56 @@ import time #time library
 import threading #threading library
 from queue import Queue #queue library
 
+#this class creates a window for displaying the file contents
+#it also creates a thread for reading the file
+#and a function for updating the text widget
+#the thread is started in the main function
+#the update function is called in the mainloop
+#the update function is called periodically
 class DispClass(tk.Frame):
+     #initialize the class
     def __init__(self, master=None):
         super().__init__(master)
         frame = tk.Frame(self.master)
         frame.pack(fill="both", expand=True)
 
-        # display the file content here
+        # create a text widget for displaying the file contents
         self.text_widget = tk.Text(frame, bg="midnightblue", fg= "white",font=("Arial", 16))
         self.text_widget.pack(fill="both", expand=True)
         self.label = tk.Label(frame, text="Reading Temperature...", fg="white")
         self.label.pack()
-
+        
+     #function for reading the file
+     #the file is locked to prevent data corruption
+     #the file is unlocked to allow other processes to access it
     def read_file(self, q, filename):
         while True:
             try:
                 with open(filename, "r") as file:
+                     # lock the file
                     fcntl.flock(file, fcntl.LOCK_SH)
 
                     for line in file:
                         # insert the file content into the queue
                         q.put(line)
-                         
+                    #unlock the file
                     fcntl.flock(file, fcntl.LOCK_UN)
 
-                time.sleep(10)
+                time.sleep(10) #wait 10 seconds before reading the file again
+                # clear the text widget
                 self.text_widget.delete("1.0", "end")
+            
             except tk.TclError as error:  # program will know that its been closed on purpose
                 print("Program was closed", error)
                 return
 
-
+#main function
+#creates a new window for displaying the file contents
+#creates a new window for displaying the error message
+#starts the thread
+#calls the update function periodically
+#calls the mainloop
+#the mainloop is called in the main function
 def main():
     filename = "/home/pi/Desktop/Temperature_Humidity.log"
     if os.path.exists(filename):  # returns true if file exists
