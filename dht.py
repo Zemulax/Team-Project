@@ -2,22 +2,27 @@ import time
 import board #define the gpio pin in use
 import adafruit_dht #sensor library 
 
-#limit the time the sensor can be read
+#constants
+FILE_NAME = "/home/pi/Desktop/Temperature_Humidity.log"
+ERROR_LOG   = "/home/pi/Desktop/Error.log"
+PIN_NUMBER = board.D4
+HEADER_LINE = "||||Temperature & Humidity Gauge||||\n\n"
+ERROR_MESSAGE = "Reading Temperature Failed. is the Sensor connected?"
+
+
 line_number = 2 #line number to start reading from
 
 #Initialize the sensor, with data pin connected to:
-dhtDevice = adafruit_dht.DHT11(board.D4) #depends on where the signal cable is plugged
+dhtDevice = adafruit_dht.DHT11(PIN_NUMBER) #depends on where the signal cable is plugged
 
 #open a file to write to
-with open('Temperature_Humidity.log', 'r+') as f:
+with open(FILE_NAME, 'r+') as f:
   
   lines = f.readlines() #read the file
   
   if not lines: #if the file is empty
-    lines.append("Temperature\n") #add a header to the file
+    lines.append(HEADER_LINE) #add a header to the file
     
-    #start the timer
-    start_time = time.monotonic()
     #loop until the time limit is reached
     while  True:
           try:
