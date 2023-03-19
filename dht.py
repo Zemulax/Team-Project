@@ -3,7 +3,6 @@ import board #define the gpio pin in use
 import adafruit_dht #sensor library 
 
 #limit the time the sensor can be read
-period = 30 #seconds
 line_number = 2 #line number to start reading from
 
 #Initialize the sensor, with data pin connected to:
@@ -20,7 +19,7 @@ with open('Temperature_Humidity.log', 'r+') as f:
     #start the timer
     start_time = time.monotonic()
     #loop until the time limit is reached
-    while time.monotonic() - start_time < period:  #time wil not go backwards
+    while  True:
           try:
                   # get the readings from the sensor
                   temperature_c = dhtDevice.temperature 
