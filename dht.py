@@ -4,6 +4,8 @@ import adafruit_dht #sensor library
 import fcntl #file locking library
 import os #operating system library
 from datetime import datetime #date and time library
+import threading #threading library
+import subprocess #subprocess library
 
 #constants
 FILE_NAME = "/home/pi/Desktop/Temperature_Humidity.log"
@@ -18,6 +20,12 @@ error_time = now.strftime("%H:%M:%S")
 line_number = 2 #line number to start reading from
 dhtSensor = adafruit_dht.DHT11(PIN_NUMBER) #Initialize the sensor, with data pin connected to: PIN_NUMBER
 
+#function to call the display.py file
+#this function is called in a thread
+#so that the program can continue to read the temperature
+#while the display is reading from the file
+def call_display():
+    subprocess.call(["python3", "display.py"]) #call the subprocess
 
 #function to write errors to a file
 def error_reporting(name):
@@ -74,14 +82,23 @@ def read_temperature():
                       
               except OverflowError:
                      error_reporting("Sensor seems to be disconnected")
-                     dhtsensor.exit()
+                     dhtSensor.exit()
                      quit()
                      
               except KeyboardInterrupt:
                      error_reporting("Program was closed")
-                     dhtsensor.exit()
+                     dhtSensor.exit()
                      quit()
 
       dhtSensor.exit() #close the sensor        
 
-print("Temperature reading completed") #the program is done
+def main():
+  thread = threading.Thread(target=call_display) #create a thread
+  thread.start() #start the thread
+  read_temperature() #call the read_temperature function
+
+#call the main function
+#when the program is executed
+#this is the entry point of the program
+if __name__ == "__main__":
+  main() #call the main function
