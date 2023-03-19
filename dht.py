@@ -3,6 +3,7 @@ import board #define the gpio pin in use
 import adafruit_dht #sensor library 
 import fcntl #file locking library
 import os #operating system library
+from datetime import datetime #date and time library
 
 #constants
 FILE_NAME = "/home/pi/Desktop/Temperature_Humidity.log"
@@ -11,22 +12,34 @@ PIN_NUMBER = board.D4
 HEADER_LINE = "||||Temperature & Humidity Gauge||||\n\n"
 ERROR_MESSAGE = "Reading Temperature Failed. is the Sensor connected?"
 
-
+#variables
+now = datetime.now() #get the current date and time
+error_time = now.strftime("%H:%M:%S")
 line_number = 2 #line number to start reading from
+dhtSensor = adafruit_dht.DHT11(PIN_NUMBER) #Initialize the sensor, with data pin connected to: PIN_NUMBER
 
-#Initialize the sensor, with data pin connected to:
-dhtSensor = adafruit_dht.DHT11(PIN_NUMBER) #depends on where the signal cable is plugged
 
-def read_temperature(): #function to read temperature from the sensor
-
+#function to write errors to a file
+def error_reporting(name):
+    with open(ERROR_LOG, 'w') as error_file:
+      error_file.write(error_time + ": ")
+      error_file.write(name)
+      error_file.flush()
+      error_file.close() #clear
+      
+#function to read temperature from the sensor
+#and write it to a file
+#the file is locked to prevent data corruption
+#the file is flushed to clear the buffer
+def read_temperature():
     #create or open a file with read and right permissions
     with open(FILE_NAME, 'w+') as file:
 
-      lines = file.readlines() #read the file
+      lines = file.readlines() #read the filelines into a list called lines
 
       if not lines: #if the file is empty ->
         file.write(ERROR_MESSAGE) #add a header to the file
-        lines.append(HEADER_LINE)
+        lines.append(HEADER_LINE) #add a header to the list
 
         #loop forever
         while True:
@@ -50,8 +63,9 @@ def read_temperature(): #function to read temperature from the sensor
                       file.truncate() #delete the rest of the file
                       file.flush() #flush the buffer
                       time.sleep(5.0) #get measurements every 2 secon
-
-              except RuntimeError as error: #catch errors
+              
+              #catch errors
+              except RuntimeError as error: 
                       error_reporting(ERROR_MESSAGE) #print error messages to the console but continue executing the program
                       continue
                     
