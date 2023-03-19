@@ -28,10 +28,10 @@ def call_display():
     subprocess.call(["python3", "display.py"]) #call the subprocess
 
 #function to write errors to a file
-def error_reporting(name):
+def error_reporting(error):
     with open(ERROR_LOG, 'w') as error_file:
       error_file.write(error_time + ": ")
-      error_file.write(name)
+      error_file.write(error)
       error_file.flush()
       error_file.close() #clear
       
