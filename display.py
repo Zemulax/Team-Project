@@ -60,7 +60,7 @@ class DispClass(tk.Frame):
 def main():
     # create a new window for displaying the file contents from the log
     window = tk.Tk()
-    window.title("DHT11")
+    window.title("Temperature & Humidity Gauge")
     window.geometry("380x250")
     window.configure(bg="white")
     window.configure(borderwidth=10, relief="sunken")

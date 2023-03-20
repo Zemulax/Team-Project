@@ -11,7 +11,7 @@ import subprocess #subprocess library
 FILE_NAME = "/home/pi/TemperatureFolder/Temperature_Humidity.log"
 ERROR_LOG   = "/home/pi/Desktop/Error.log"
 PIN_NUMBER = board.D4
-HEADER_LINE = "||||Temperature & Humidity Gauge||||\n\n"
+HEADER_LINE = "||||Today's Weather Report||||\n\n"
 ERROR_MESSAGE = "Reading Temperature Failed. is the Sensor connected?"
 
 #variables
