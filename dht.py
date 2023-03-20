@@ -26,6 +26,7 @@ dhtSensor = adafruit_dht.DHT11(PIN_NUMBER) #Initialize the sensor, with data pin
 #while the display is reading from the file
 def call_display():
     subprocess.call(["python3", "display.py"]) #call the subprocess
+    #for compilation purposes use this line instead: subprocess.call(["python3", os.path.join(sys._MEIPASS, "displayTest.py")]) #
 
 #function to write errors to a file
 def error_reporting(error):
