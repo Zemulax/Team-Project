@@ -58,18 +58,23 @@ class DispClass(tk.Frame):
 #calls the mainloop
 #the mainloop is called in the main function
 def main():
+    # create a new window for displaying the file contents from the log
+    window = tk.Tk()
+    window.title("DHT11")
+    window.geometry("380x250")
+    window.configure(bg="white")
+    window.configure(borderwidth=10, relief="sunken")
+    window.resizable(width=False, height=False)
+    disp = DispClass(master=window)
+    disp.pack(fill="both", expand=True)
+    
+    #icon for the window
+    icon = tk.PhotoImage(file="icon2.png")
+    window.iconphoto(True, icon)
+    
     filename = "/home/pi/Desktop/Temperature_Humidity.log"
     if os.path.exists(filename):  # returns true if file exists
-        # create a new window for displaying the file contents from the log
-        window = tk.Tk()
-        window.title("DHT11")
-        window.geometry("380x250")
-        window.configure(bg="white")
-        window.configure(borderwidth=10, relief="sunken")
-        window.resizable(width=False, height=False)
-
-        disp = DispClass(master=window)
-        disp.pack(fill="both", expand=True)
+        
 
         q = Queue()
         t = threading.Thread(target=disp.read_file, args=(q, filename))
@@ -83,24 +88,15 @@ def main():
             window.after(500, update_text_widget)
             
         window.after(500, update_text_widget)
-        window.mainloop()
+        
 
     else:
-        # create a new window for displaying the error message
-        window = tk.Tk()
-        window.title("DHT11")
-        window.geometry("400x250")
-        window.configure(borderwidth=5, relief="sunken")
-        window.resizable(width=False, height=False)
-
-        disp = DispClass(master=window)
-        disp.pack(fill="both", expand=True)
 
         disp.text_widget.insert("end", """Sensor log was not found!!\nIs the sensor running?\n"""
                                        """Restart this program when the sensor is operational""")
         disp.text_widget.configure(state="disabled")  # disabled editing
 
-        window.mainloop()
+    window.mainloop()
 
 if __name__ == '__main__':
     main()
