@@ -72,7 +72,7 @@ def main():
     icon = tk.PhotoImage(file="icon2.png")
     window.iconphoto(True, icon)
     
-    filename = "/home/pi/Desktop/Temperature_Humidity.log"
+    filename = "/home/pi/TemperatureFolder/Temperature_Humidity.log"
     if os.path.exists(filename):  # returns true if file exists
         
 

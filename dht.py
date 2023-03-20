@@ -8,7 +8,7 @@ import threading #threading library
 import subprocess #subprocess library
 
 #constants
-FILE_NAME = "/home/pi/Desktop/Temperature_Humidity.log"
+FILE_NAME = "/home/pi/TemperatureFolder/Temperature_Humidity.log"
 ERROR_LOG   = "/home/pi/Desktop/Error.log"
 PIN_NUMBER = board.D4
 HEADER_LINE = "||||Temperature & Humidity Gauge||||\n\n"
