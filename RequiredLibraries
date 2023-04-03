@@ -12,3 +12,6 @@ Either manually create the missing folders you see in the error "/home/pi/dht/mi
 Then go to the libgpiod folder and copy the libgpiod_ pulsein executable and paste it in the above path
 or simply install libgpiod in the path where your python executable is.
 
+This is a command for compiling the python file into an executable file.
+pyinstaller --onefile --add-data "hygrometergui.py:." --add-data "/home/pi/Desktop/SafetyStorage/adafruit_blinka/microcontroller/bcm283x/pulseio/libgpiod_pulsein:adafruit_blinka/microcontroller/bcm283x/pulseio"  hygrometer.py
+
