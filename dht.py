@@ -23,13 +23,13 @@ dhtSensor = adafruit_dht.DHT11(PIN_NUMBER) #Initialize the sensor, with data pin
 def quit():
   sys.exit(0)
   
-#function to call the display.py file
+#function to call the hygrometergui.py file
 #this function is called in a thread
 #so that the program can continue to read the temperature
 #while the display is reading from the file
 def call_display():
     subprocess.call(["python3", "/home/pi/Desktop/TestFolder/nearfinal/hygrometergui.py"]) #call the subprocess
-    #subprocess.call(["python3", os.path.join(sys._MEIPASS, "hygrometergui.py")]) #call the subprocess when creating executable use this line
+    #subprocess.call(["python3", os.path.join(sys._MEIPASS, "hygrometergui.py")]) #when creating an executable use this line
 
 #function to write errors to a file
 def error_reporting(error):
@@ -41,7 +41,7 @@ def error_reporting(error):
 #function to read temperature from the sensor
 #and write it to a file
 #the file is locked to prevent data corruption
-#the file is flushed to clear the buffer
+#the file is flushed to clear the buffer and make sure it is written to
 def read_temperature():
     #create or open a file with read and right permissions
     with open(FILE_NAME, 'w+') as file:

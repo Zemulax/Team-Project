@@ -65,20 +65,18 @@ def main():
     window.configure(borderwidth=10, relief="sunken")
     window.resizable(width=False, height=False)
 
-    #icon = tk.PhotoImage(file="home/pi/Desktop/TestFolder/magni/icon.png")
-    #window.iconphoto(True, icon)
-
     disp = DispClass(master=window)
     disp.pack(fill="both", expand=True)
     
     filename = "/home/pi/TemperatureFolder/Temperature_Humidity.log"
     if os.path.exists(filename):  # returns true if file exists
         
-
+        #create a queue for passing data between threads
         q = Queue()
         t = threading.Thread(target=disp.read_file, args=(q, filename))
         t.start()
-
+         
+         #function for updating the text widget
         def update_text_widget():
             while not q.empty():
                 line = q.get_nowait()
@@ -90,7 +88,7 @@ def main():
         window.mainloop()
         
     else:
-
+        # disly this if the log file is not found
         disp.text_widget.insert("end", """Sensor log was not found!!\nIs the sensor running?\n"""
                                        """Restart this program when the sensor is operational""")
         disp.text_widget.configure(state="disabled")  # disabled editing
