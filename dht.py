@@ -6,35 +6,37 @@ import os #operating system library
 from datetime import datetime #date and time library
 import threading #threading library
 import subprocess #subprocess library
+import sys
 
 #constants
 FILE_NAME = "/home/pi/TemperatureFolder/Temperature_Humidity.log"
-ERROR_LOG   = "/home/pi/Desktop/Error.log"
 PIN_NUMBER = board.D4
 HEADER_LINE = "||||Today's Weather Report||||\n\n"
-ERROR_MESSAGE = "Reading Temperature Failed. is the Sensor connected?"
+INFO = "" #add an empty line
 
 #variables
-now = datetime.now() #get the current date and time
-error_time = now.strftime("%H:%M:%S")
 line_number = 2 #line number to start reading from
 dhtSensor = adafruit_dht.DHT11(PIN_NUMBER) #Initialize the sensor, with data pin connected to: PIN_NUMBER
 
+#this function simply exits the program
+#upon specified error occurrence
+def quit():
+  sys.exit(0)
+  
 #function to call the display.py file
 #this function is called in a thread
 #so that the program can continue to read the temperature
 #while the display is reading from the file
 def call_display():
-    subprocess.call(["python3", "display.py"]) #call the subprocess
-    #for compilation purposes use this line instead: subprocess.call(["python3", os.path.join(sys._MEIPASS, "displayTest.py")]) #
+    subprocess.call(["python3", "/home/pi/Desktop/TestFolder/nearfinal/hygrometergui.py"]) #call the subprocess
+    #subprocess.call(["python3", os.path.join(sys._MEIPASS, "hygrometergui.py")]) #call the subprocess when creating executable use this line
 
 #function to write errors to a file
 def error_reporting(error):
-    with open(ERROR_LOG, 'w') as error_file:
-      error_file.write(error_time + ": ")
-      error_file.write(error)
-      error_file.flush()
-      error_file.close() #clear
+    with open("/home/pi/TemperatureFolder/Temperature_Humidity.log", 'w') as file:
+      file.truncate()
+      file.write(error)
+      file.flush()
       
 #function to read temperature from the sensor
 #and write it to a file
@@ -47,7 +49,7 @@ def read_temperature():
       lines = file.readlines() #read the filelines into a list called lines
 
       if not lines: #if the file is empty ->
-        file.write(ERROR_MESSAGE) #add a header to the file
+        file.write(INFO) #add a header line as starting point
         lines.append(HEADER_LINE) #add a header to the list
 
         #loop forever
@@ -75,19 +77,21 @@ def read_temperature():
               
               #catch errors
               except RuntimeError as error: 
-                      error_reporting(ERROR_MESSAGE) #print error messages to the console but continue executing the program
-                      continue
+                     error_reporting("Awaiting Sensor...") #print error messages to the display but continue executing the program
+                     time.sleep(30)
+                     continue
                     
               except TypeError:
-                      error_reporting(ERROR_MESSAGE)
+                     file.write("Unable to Read from Sensor")
+                     time.sleep(10)
+                     continue
                       
               except OverflowError:
-                     error_reporting("Sensor seems to be disconnected")
-                     dhtSensor.exit()
+                     error_reporting("Halted.Connect Sensor and Restart Program")
+                     time.sleep(20)
                      quit()
-                     
+       
               except KeyboardInterrupt:
-                     error_reporting("Program was closed")
                      dhtSensor.exit()
                      quit()
 
