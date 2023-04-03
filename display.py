@@ -6,6 +6,7 @@ import fcntl #file locking library
 import time #time library
 import threading #threading library
 from queue import Queue #queue library
+import sys
 
 #this class creates a window for displaying the file contents
 #it also creates a thread for reading the file
@@ -23,8 +24,6 @@ class DispClass(tk.Frame):
         # create a text widget for displaying the file contents
         self.text_widget = tk.Text(frame, bg="midnightblue", fg= "white",font=("Arial", 16))
         self.text_widget.pack(fill="both", expand=True)
-        self.label = tk.Label(frame, text="Reading Temperature...", fg="white")
-        self.label.pack()
         
      #function for reading the file
      #the file is locked to prevent data corruption
@@ -47,8 +46,8 @@ class DispClass(tk.Frame):
                 self.text_widget.delete("1.0", "end")
             
             except tk.TclError as error:  # program will know that its been closed on purpose
-                print("Program was closed", error)
-                return
+                quit("Program was closed")
+                
 
 #main function
 #creates a new window for displaying the file contents
@@ -58,19 +57,19 @@ class DispClass(tk.Frame):
 #calls the mainloop
 #the mainloop is called in the main function
 def main():
-    # create a new window for displaying the file contents from the log
+# create a new window for displaying the file contents from the log
     window = tk.Tk()
-    window.title("Temperature & Humidity Gauge")
-    window.geometry("380x250")
+    window.title("Hygrometer")
+    window.geometry("307x210")
     window.configure(bg="white")
     window.configure(borderwidth=10, relief="sunken")
     window.resizable(width=False, height=False)
+
+    #icon = tk.PhotoImage(file="home/pi/Desktop/TestFolder/magni/icon.png")
+    #window.iconphoto(True, icon)
+
     disp = DispClass(master=window)
     disp.pack(fill="both", expand=True)
-    
-    #icon for the window
-    icon = tk.PhotoImage(file="icon2.png")
-    window.iconphoto(True, icon)
     
     filename = "/home/pi/TemperatureFolder/Temperature_Humidity.log"
     if os.path.exists(filename):  # returns true if file exists
@@ -88,8 +87,8 @@ def main():
             window.after(500, update_text_widget)
             
         window.after(500, update_text_widget)
+        window.mainloop()
         
-
     else:
 
         disp.text_widget.insert("end", """Sensor log was not found!!\nIs the sensor running?\n"""
